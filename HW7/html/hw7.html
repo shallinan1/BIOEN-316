@@ -1,0 +1,191 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>hw7</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-06-06"><meta name="DC.source" content="hw7.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">RLC Circuit</a></li><li><a href="#3">FIR Filter</a></li></ul></div><pre class="codeinput"><span class="comment">% Skyler Hallinan</span>
+<span class="comment">% 6/1/19</span>
+<span class="comment">% Homework 6: Part B</span>
+
+clear <span class="string">all</span>; close <span class="string">all</span>; clc;
+
+<span class="comment">% Changing our default fonts</span>
+set (0, <span class="string">'defaultAxesFontName'</span>, <span class="string">'CMU Serif'</span>)
+set (0, <span class="string">'defaultTextFontName'</span>, <span class="string">'CMU Serif'</span>)
+</pre><h2 id="2">RLC Circuit</h2><pre class="codeinput">whigh = 50*2* pi;
+wlow = 0.5*2*pi;
+alpha = (whigh - wlow)/2;
+
+<span class="comment">%w01 = sqrt((whigh - alpha)^2-alpha^2);</span>
+<span class="comment">%w02 = sqrt((wlow + alpha)^2-alpha^2);</span>
+w0 = sqrt(((whigh +wlow)/2)^2-alpha^2);
+
+
+
+close <span class="string">all</span>;
+
+omegas = logspace(-3,6,100);
+<span class="comment">%gain = sqrt(4 * alpha.^2 .* omegas.^2)./sqrt(((w0^2-omegas.^2).^2 + 4*alpha.^2*omegas.^2))</span>
+gain = abs((2*alpha.*omegas*i)./((i.*omegas).^2+2*alpha.*omegas*i+w0^2));
+
+semilogx(omegas,20*log10(gain), <span class="string">'linewidth'</span>, 4)
+set(gca, <span class="string">'fontsize'</span>, 16);
+ylabel(<span class="string">"Gain (dB)"</span>, <span class="string">'fontsize'</span>, 24); xlabel(<span class="string">"Frequency (rads/sec)"</span>, <span class="string">'fontsize'</span>, 24);
+title(<span class="string">"Bandpass Filter Comparisons"</span>, <span class="string">'fontsize'</span> , 48);
+grid <span class="string">on</span>;
+
+hold <span class="string">on</span>;
+</pre><img vspace="5" hspace="5" src="hw7_01.png" alt=""> <h2 id="3">FIR Filter</h2><pre class="codeinput">tlim = (3*pi)/alpha;
+fs = 500;
+ts = 1/fs;
+t = -tlim:ts:tlim-ts;
+t(t == 0) = 1e-9;
+
+
+filter = (cos((wlow+whigh)/2 *t).*sin(alpha*t).*(0.54+0.46*cos(alpha/3 * t)))./(pi*t);
+nlen = length(filter);
+
+fftdomain = (-nlen/2:1/256:nlen/2)*(fs/nlen)*2*pi;
+fft_FIR = fftshift(abs(fft(filter)));
+gain = max(fft_FIR);
+filter = filter/gain;
+
+semilogx(fftdomain, db(abs(fftshift(fft(filter, 15361)))), <span class="string">'c'</span>, <span class="string">'linewidth'</span>, 2)
+grid <span class="string">on</span>;
+</pre><img vspace="5" hspace="5" src="hw7_02.png" alt=""> <pre class="codeinput">nyq  = fs*pi;
+[b,a] = butter(1, [wlow/nyq, whigh/nyq]);
+[h f] = freqz(b,a, 40960, fs*2*pi);
+semilogx(f, db(h), <span class="string">'m'</span>, <span class="string">'linewidth'</span>, 4);
+
+legend(<span class="string">"RLC Circuit"</span>, <span class="string">"FIR Filter"</span>, <span class="string">"Butterworth Filter"</span>, <span class="string">'location'</span>, <span class="string">'best'</span>, <span class="string">'fontsize'</span>, 24);
+xlim([min(omegas), max(omegas)]);
+</pre><img vspace="5" hspace="5" src="hw7_03.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% Skyler Hallinan
+% 6/1/19
+% Homework 6: Part B
+
+clear all; close all; clc;
+
+% Changing our default fonts
+set (0, 'defaultAxesFontName', 'CMU Serif')
+set (0, 'defaultTextFontName', 'CMU Serif')
+
+%% RLC Circuit 
+
+whigh = 50*2* pi;
+wlow = 0.5*2*pi;
+alpha = (whigh - wlow)/2;
+
+%w01 = sqrt((whigh - alpha)^2-alpha^2);
+%w02 = sqrt((wlow + alpha)^2-alpha^2);
+w0 = sqrt(((whigh +wlow)/2)^2-alpha^2);
+
+
+
+close all;
+
+omegas = logspace(-3,6,100);
+%gain = sqrt(4 * alpha.^2 .* omegas.^2)./sqrt(((w0^2-omegas.^2).^2 + 4*alpha.^2*omegas.^2))
+gain = abs((2*alpha.*omegas*i)./((i.*omegas).^2+2*alpha.*omegas*i+w0^2));
+
+semilogx(omegas,20*log10(gain), 'linewidth', 4)
+set(gca, 'fontsize', 16);
+ylabel("Gain (dB)", 'fontsize', 24); xlabel("Frequency (rads/sec)", 'fontsize', 24);
+title("Bandpass Filter Comparisons", 'fontsize' , 48);
+grid on;
+ 
+hold on;
+
+%% FIR Filter
+tlim = (3*pi)/alpha;
+fs = 500;
+ts = 1/fs;
+t = -tlim:ts:tlim-ts;
+t(t == 0) = 1e-9;
+
+
+filter = (cos((wlow+whigh)/2 *t).*sin(alpha*t).*(0.54+0.46*cos(alpha/3 * t)))./(pi*t);
+nlen = length(filter);
+
+fftdomain = (-nlen/2:1/256:nlen/2)*(fs/nlen)*2*pi;
+fft_FIR = fftshift(abs(fft(filter)));
+gain = max(fft_FIR);
+filter = filter/gain;
+
+semilogx(fftdomain, db(abs(fftshift(fft(filter, 15361)))), 'c', 'linewidth', 2)
+grid on;
+%%
+nyq  = fs*pi;
+[b,a] = butter(1, [wlow/nyq, whigh/nyq]);
+[h f] = freqz(b,a, 40960, fs*2*pi);
+semilogx(f, db(h), 'm', 'linewidth', 4);
+ 
+legend("RLC Circuit", "FIR Filter", "Butterworth Filter", 'location', 'best', 'fontsize', 24);
+xlim([min(omegas), max(omegas)]);   
+
+##### SOURCE END #####
+--></body></html>
